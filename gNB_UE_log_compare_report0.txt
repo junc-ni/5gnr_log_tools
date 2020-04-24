@@ -1,0 +1,86 @@
+---------------------------------------------------------------------------
+Starting 5G NR log parsing and comparison between gNB and UE log files
+---------------------------------------------------------------------------
+
+Start time: Fri Apr 24 06:58:07 2020
+
+---------------------------------------------------------------------------
+Processing 5G NR UE log file...
+---------------------------------------------------------------------------
+UE log file name: log_text_0.txt
+Number of lines: 150116
+Reading lines and searching Connected status from NR UE log file...
+UE log file name: log_text_0.txt
+Number of lines: 150116
+[ ======                                                                           Line 12950] 8.63%
+2020-03-10 23:29:00.247479 [PHY ] [INFO] SYSTEM:  {system state: Connected, sync valid: TRUE}
+
+Connected and SYNC states were found at Line 12981 !
+
+Searching PDCCH messages with DCI 1_1 format...
+[ =========================                                                        Line 47350] 31.54%
+Stop searching PDCCH DCI 1_1 messages as the maximum number of 30 messages are acquired !
+[ ================================================================================      Done!] 100.00%
+Number of PDCCH DCI 1_1 messages: 30
+The first PDCCH DCI 1_1 message: 
+2020-03-10 23:29:14.731492 [PHY ] [INFO] PDCCH:  {SFN: 968, SlotNo: 5, DCIType: 1_1, DCI Length: 50, CC: 0, NLayers: 4, MCS: 21, PdschStartSymbol: 1, PdschLenSymbol: 13, PRB start: 0, PRB end: 272, NoREs: 39312, TBsize: 868584, RV: 0, HARQProcNo: 1, NDIToggled: 1, RNTI type: 0, DciBits[0]: 0xFFFFE150, DciBits[1]: 0x28340000, DciBits[2]: 0x00000000}
+
+The last PDCCH DCI 1_1 message: 
+2020-03-10 23:29:14.753036 [PHY ] [INFO] PDCCH:  {SFN: 970, SlotNo: 12, DCIType: 1_1, DCI Length: 50, CC: 0, NLayers: 4, MCS: 31, PdschStartSymbol: 1, PdschLenSymbol: 13, PRB start: 0, PRB end: 240, NoREs: 34704, TBsize: 770568, RV: 0, HARQProcNo: 13, NDIToggled: 0, RNTI type: 0, DciBits[0]: 0x9FFFE1F1, DciBits[1]: 0xA8940000, DciBits[2]: 0x00000000}
+
+
+Parsing fields and extracting field values from PDCCH DCI 1_1 messages (NR UE log data)...
+List of extracted field values from the 1st PDCCH DCI 1_1 message: 
+[968, 5, 21, 1, 13, 0, 272, 1, 'FFFFE150', '28340000']
+Number of parsed PDCCH DCI 1_1 messages:     30
+
+---------------------------------------------------------------------------
+Processing 5G NR gNB log file...
+---------------------------------------------------------------------------
+gNB log file name: gNB_log.txt
+Number of lines: 4852324
+
+Reading lines from the gNB log file and searching gNB configurations slot by slot...
+
+Number of PDCCH Messages: 30
+[ ================================================================================      Done!] 100.00%
+Number of lines: 4852324
+
+List of extracted field values from the 1st PDCCH DCI 1_1 message: 
+[968, 5, 21, 1, 13, 0, 273, 1, 'FFFFE150283400']
+Number of parsed PDCCH DCI 1_1 messages:     21
+
+---------------------------------------------------------------------------
+Summary of UE and gNB log data parsing and comparison
+UE Status: RACH Success + 1st HARQ id is matched after RACH success 
+
+                Item     Mismatched Count
+                 SFN                    0
+              SlotNo                    0
+                 MCS                    5
+    PdschStartSymbol                    0
+      PdschLenSymbol                    0
+           PRB start                    2
+             PRB end                    0
+          HARQProcNo                    0
+            DCI bits                    0
+---------------------------------------------------------------------------
+
+List of mismatched fields between gNB and UE log messages: 
+    UE  : ['SFN', 'SlotNo', 'MCS', 'PdschStartSymbol', 'PdschLenSymbol', 'PRB start', 'PRB end', 'HARQProcNo', 'DciBits[0]', 'DciBits[1]']
+    gNB : ['nSFN', 'nSlot', 'nMCS[0]', 'nStartSymbolIndex', 'nNrOfSymbols', 'nRBStart', 'nRBSize', 'nHARQID', 'DCI bits']
+  1.UE  : [968, 16, 31, 1, 13, 0, 272, 2, 'FFFFE1F0', '48140000']
+    gNB : [968, 16, 21, 1, 13, 0, 273, 2, 'FFFFE1F0481400']
+  2.UE  : [969, 0, 21, 1, 13, 0, 240, 15, '9FFFE151', 'E8340000']
+    gNB : [969, 0, 21, 1, 13, 32, 241, 15, '9FFFE151E83400']
+  3.UE  : [969, 1, 31, 1, 13, 0, 272, 7, 'FFFFE1F0', 'E8140000']
+    gNB : [969, 1, 21, 1, 13, 0, 273, 7, 'FFFFE1F0E81400']
+  4.UE  : [969, 6, 31, 1, 13, 0, 272, 2, 'FFFFE1F0', '48140000']
+    gNB : [969, 6, 21, 1, 13, 0, 273, 2, 'FFFFE1F0481400']
+  5.UE  : [969, 11, 31, 1, 13, 0, 272, 12, 'FFFFE1F1', '88140000']
+    gNB : [969, 11, 21, 1, 13, 0, 273, 12, 'FFFFE1F1881400']
+  6.UE  : [969, 12, 31, 1, 13, 0, 240, 15, '9FFFE1F1', 'E8940000']
+    gNB : [969, 12, 21, 1, 13, 32, 241, 15, '9FFFE1F1E89400']
+
+---------------------------------------------------------------------------
+Elapsed time: 4 seconds
