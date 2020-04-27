@@ -26,7 +26,7 @@ flag_print_ue_searched_pdcch_list=False
 flag_print_gnb_searched_pdcch_list=False
 
 # if ue_pdcch_dci11_num_max is zero, the program scans all PDCCH DCI 1_1 messsags in the log file
-ue_pdcch_dci11_num_max=100 # maximum number of PDCCH DCI1_1 messages to read and parse
+ue_pdcch_dci11_num_max=200 # maximum number of PDCCH DCI1_1 messages to read and parse
 
 # drawbar length
 drawbar_len=40
@@ -311,29 +311,41 @@ def readParseUeLogData(f_ue_log, ue_field_name_pat_arr, ue_log_conn_pattern, ue_
     return [ue_field_var, flag_connected_state_found]
 
 def searchExtractUeGnbLogFields (pdcch_line_arr, ue_field_var,pdcch_dci11_count,ue_field_len,
-                                 gn_field_name_pat_arr, sfn_curr, slot_idx_curr, harq_id_curr, flag_harq_id_check):
+                                 gn_field_name_pat_arr, sfn_curr, slot_idx_curr, harq_id_curr, flag_harq_id_check,
+                                 log_dict_sfn_slot_occur):
     gn_field_var=[]
     flag_matched_pdcch_frame=False
     gn_log_dcibits_pat = "DCI bits"  # DCI bits pattern
 
+    matched_sfn_slot_count=0  # start from zero!
+    sfn_slot_occur=1
     for ue_pdcch_idx in range (pdcch_dci11_count):
         sfn = ue_field_var[ue_pdcch_idx * ue_field_len]
         slot_idx = ue_field_var[ue_pdcch_idx * ue_field_len + 1]
         if (sfn_curr==sfn) and (slot_idx_curr==slot_idx):
-            if flag_harq_id_check:
-                harq_id = ue_field_var[ue_pdcch_idx * ue_field_len + 7]
-                if harq_id_curr==harq_id:
-                   flag_matched_pdcch_frame=True
+            matched_sfn_slot_count +=1
+            if matched_sfn_slot_count==1:
+               [log_dict_sfn_slot_occur, sfn_slot_occur] = updateSfnSlotOccurence(log_dict_sfn_slot_occur, sfn_curr,
+                                                                               slot_idx_curr)
+
+            if sfn_slot_occur==matched_sfn_slot_count:
+                if flag_harq_id_check:
+                    harq_id = ue_field_var[ue_pdcch_idx * ue_field_len + 7]
+                    if harq_id_curr==harq_id:
+                        flag_matched_pdcch_frame=True
+                    else:
+                        flag_matched_pdcch_frame=False
                 else:
-                    flag_matched_pdcch_frame=False
+                    flag_matched_pdcch_frame=True
             else:
-                flag_matched_pdcch_frame=True
-            break
+                 flag_matched_pdcch_frame=False
+            if flag_matched_pdcch_frame:
+               break
 
     ue_pdcch_matched_idx=ue_pdcch_idx
 
     if not flag_matched_pdcch_frame:
-        return [flag_matched_pdcch_frame, gn_field_var, ue_pdcch_matched_idx]
+        return [flag_matched_pdcch_frame, gn_field_var, ue_pdcch_matched_idx, log_dict_sfn_slot_occur]
 
     # print (gn_pdcch_list_tmp)
     for i, search_str in enumerate(gn_field_name_pat_arr):
@@ -363,7 +375,29 @@ def searchExtractUeGnbLogFields (pdcch_line_arr, ue_field_var,pdcch_dci11_count,
     if flag_debug_mode:
         print('\nList of PDCCH fields is %s' % str(gn_field_var))
 
-    return [flag_matched_pdcch_frame, gn_field_var, ue_pdcch_matched_idx]
+    return [flag_matched_pdcch_frame, gn_field_var, ue_pdcch_matched_idx, log_dict_sfn_slot_occur]
+
+def computeSfnSlotOccurence(ue_field_var,pdcch_dci11_count,ue_field_len):
+    ue_log_sfn_slot_occur={}
+    for ue_pdcch_idx in range (pdcch_dci11_count):
+        sfn = ue_field_var[ue_pdcch_idx * ue_field_len]
+        slot_idx = ue_field_var[ue_pdcch_idx * ue_field_len + 1]
+        name="SFN="+str(sfn)+","+"Slot="+str(slot_idx)
+        if name in ue_log_sfn_slot_occur:
+            ue_log_sfn_slot_occur[name] +=1
+        else:
+            ue_log_sfn_slot_occur.update({name: 1})
+    return ue_log_sfn_slot_occur
+
+
+def updateSfnSlotOccurence(log_dict_sfn_slot_occur, sfn,slot_idx):
+    name="SFN="+str(sfn)+","+"Slot="+str(slot_idx)
+    if name in log_dict_sfn_slot_occur:
+        log_dict_sfn_slot_occur[name] +=1
+    else:
+        log_dict_sfn_slot_occur.update({name: 1})
+    sfn_slot_occur=log_dict_sfn_slot_occur[name]
+    return [log_dict_sfn_slot_occur, sfn_slot_occur]
 
 def readParseGnbLogData(f_gn_log, gn_msg3_search_pat, gn_field_name_pat_arr, ue_field_var, pdcch_dci11_count,
                         ue_field_len, flag_harq_id_align_on_1st_pdcch, flag_debug_mode):
@@ -427,6 +461,7 @@ def readParseGnbLogData(f_gn_log, gn_msg3_search_pat, gn_field_name_pat_arr, ue_
     gn_pdcch_field_var = []
     flag_harq_id_check=False
     gn_pdcch_count=0
+    log_dict_sfn_slot_occur={}
 
 
     if flag_debug_mode:
@@ -555,9 +590,9 @@ def readParseGnbLogData(f_gn_log, gn_msg3_search_pat, gn_field_name_pat_arr, ue_
             #print(
             #        "\nParsing and extracting field values: sfn_curr=%d, slot_idx_curr=%d, harq_id_curr=%d, flag_harq_id_check=%d"
              #       % (sfn_curr, slot_idx_curr, harq_id_curr, flag_harq_id_check))
-            [flag_matched_pdcch_frame, gn_field_var_tmp, ue_pdcch_matched_idx]=searchExtractUeGnbLogFields( gn_pdcch_list_tmp, ue_field_var, pdcch_dci11_count, ue_field_len,
+            [flag_matched_pdcch_frame, gn_field_var_tmp, ue_pdcch_matched_idx, log_dict_sfn_slot_occur]=searchExtractUeGnbLogFields( gn_pdcch_list_tmp, ue_field_var, pdcch_dci11_count, ue_field_len,
                                         gn_field_name_pat_arr, sfn_curr, slot_idx_curr, harq_id_curr,
-                                        flag_harq_id_check)
+                                        flag_harq_id_check, log_dict_sfn_slot_occur)
             if flag_matched_pdcch_frame and len(gn_field_var_tmp)>0:
                 for x in gn_field_var_tmp:
                     gn_field_var.append(x)
@@ -693,6 +728,12 @@ if __name__ == "__main__":
                        ue_log_dcitype_pattern, ue_log_chtype_pattern, ue_pdcch_dci11_num_max, flag_debug_mode, flag_print_ue_searched_pdcch_list);
 
     #print("Number of field values/elements in the list: %d" %len(ue_field_var))
+    #pdcch_dci11_count = int(len(ue_field_var) / ue_field_len)
+    #ue_log_sfn_slot_occur=computeSfnSlotOccurence(ue_field_var, pdcch_dci11_count, ue_field_len)
+    #print("ue_log_sfn_slot_occur= %s" %ue_log_sfn_slot_occur)
+    #for k, v in ue_log_sfn_slot_occur.items():
+    #    if v>1:
+    #       print("%s = %d" %{k, v})
 
     # Close file handler of 5G NR UE log
     f_ue_log.close()
