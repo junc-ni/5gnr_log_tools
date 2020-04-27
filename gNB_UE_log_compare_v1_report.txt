@@ -1,0 +1,192 @@
+
+---------------------------------------------------------------------------
+Checking 5G NR and gNB log log files... 
+---------------------------------------------------------------------------
+
+UE log file name: C:/Users/junchen/Desktop/DCI Issues/log_3_17_2020_3_09_PM_483e6352/UE/run_2020_03_17_20_14_26/log_text_0.txt
+UE log directory exists:True
+UE log file exists:     True
+gNB log file name: C:/Users/junchen/Desktop\DCI Issues\log_3_17_2020_3_09_PM_483e6352\gNB\gNBlogs_2020.03.17-20.15.48/gNB_log.txt
+gNB log directory exists:True
+gNB log file exists:     True
+
+---------------------------------------------------------------------------
+Starting 5G NR log parsing and comparison between gNB and UE log files
+---------------------------------------------------------------------------
+
+Start time: Mon Apr 27 14:21:03 2020
+
+---------------------------------------------------------------------------
+Processing 5G NR UE log file...
+---------------------------------------------------------------------------
+UE log file name: C:/Users/junchen/Desktop/DCI Issues/log_3_17_2020_3_09_PM_483e6352/UE/run_2020_03_17_20_14_26/log_text_0.txt
+Number of lines: 149933
+Reading lines and searching Connected status from NR UE log file...
+UE log file name: C:/Users/junchen/Desktop/DCI Issues/log_3_17_2020_3_09_PM_483e6352/UE/run_2020_03_17_20_14_26/log_text_0.txt
+Number of lines: 149933
+[ ===                                      Line 13400] 8.94%
+2020-03-17 20:15:32.423755 [PHY ] [INFO] SYSTEM:  {system state: Connected, sync valid: TRUE}
+
+Connected and SYNC states were found at Line 13442 !
+
+Searching PDCCH messages with DCI 1_1 format...
+[ =============                            Line 52250] 34.85%
+Stop searching PDCCH DCI 1_1 messages as the maximum number of 100 messages are acquired !
+[ ========================================      Done!] 100.00%
+Number of PDCCH DCI 1_1 messages: 100
+The first PDCCH DCI 1_1 message: 
+2020-03-17 20:15:46.864966 [PHY ] [INFO] PDCCH:  {SFN: 217, SlotNo: 10, DCIType: 1_1, DCI Length: 50, CC: 0, NLayers: 4, MCS: 21, PdschStartSymbol: 1, PdschLenSymbol: 13, PRB start: 0, PRB end: 272, NoREs: 39312, TBsize: 868584, RV: 0, HARQProcNo: 2, NDIToggled: 1, RNTI type: 0, DciBits[0]: 0xFFFFE150, DciBits[1]: 0x48340000, DciBits[2]: 0x00000000}
+
+The last PDCCH DCI 1_1 message: 
+2020-03-17 20:15:47.223825 [PHY ] [INFO] PDCCH:  {SFN: 253, SlotNo: 12, DCIType: 1_1, DCI Length: 50, CC: 0, NLayers: 4, MCS: 31, PdschStartSymbol: 1, PdschLenSymbol: 13, PRB start: 0, PRB end: 240, NoREs: 34704, TBsize: 770568, RV: 0, HARQProcNo: 12, NDIToggled: 0, RNTI type: 0, DciBits[0]: 0x9FFFE1F9, DciBits[1]: 0x88940000, DciBits[2]: 0x00000000}
+
+
+Parsing fields and extracting field values from PDCCH DCI 1_1 messages (NR UE log data)...
+List of extracted field values from the first PDCCH DCI 1_1 message: 
+[217, 10, 21, 1, 13, 0, 272, 2, 'FFFFE150', '48340000']
+List of extracted field values from the last PDCCH DCI 1_1 message: 
+[253, 12, 31, 1, 13, 0, 240, 12, '9FFFE1F9']
+Number of parsed PDCCH DCI 1_1 messages:     100
+
+---------------------------------------------------------------------------
+Processing 5G NR gNB log file...
+---------------------------------------------------------------------------
+gNB log file name: C:/Users/junchen/Desktop\DCI Issues\log_3_17_2020_3_09_PM_483e6352\gNB\gNBlogs_2020.03.17-20.15.48/gNB_log.txt
+Number of lines: 4852157
+
+Reading lines from the gNB log file and searching gNB configurations slot by slot...
+
+Number of PDCCH Messages: 100
+[                                          Line 76384] 1.57%
+MSG3 pattern is found! MSG3 bytes -> 3a 21 21 3f at Line 76523 !
+[ =========================                Line 3145912] 64.84%
+Stop searching PDCCH DCI 1_1 messages in gNB log file as the number (100) of messages is counted !
+[ ========================================      Done!] 100.00%
+Number of lines: 3145934
+
+List of extracted field values from the 1st PDCCH DCI 1_1 message: 
+[217, 10, 21, 1, 13, 0, 273, 2, 'FFFFE150483400']
+Number of parsed PDCCH DCI 1_1 messages:     100
+
+---------------------------------------------------------------------------
+Summary of UE and gNB log data parsing and comparison
+UE Status: RACH Success 
+
+                Item     Mismatched Count
+                 SFN                    0
+              SlotNo                    0
+                 MCS                   19
+    PdschStartSymbol                    0
+      PdschLenSymbol                    0
+           PRB start                   14
+             PRB end                    1
+          HARQProcNo                    4
+            DCI bits                    4
+---------------------------------------------------------------------------
+
+List of mismatched DCI bits field between gNB and UE log messages: 
+    UE  : ['SFN', 'SlotNo', 'MCS', 'PdschStartSymbol', 'PdschLenSymbol', 'PRB start', 'PRB end', 'HARQProcNo', 'DciBits[0]', 'DciBits[1]']
+    gNB : ['nSFN', 'nSlot', 'nMCS[0]', 'nStartSymbolIndex', 'nNrOfSymbols', 'nRBStart', 'nRBSize', 'nHARQID', 'DCI bits']
+  1.UE  : [217, 10, 21, 1, 13, 0, 272, 2, 'FFFFE150', '48340000']
+    gNB : [217, 10, 21, 1, 13, 0, 273, 14, 'FFFFE159C83400']
+  2.UE  : [217, 11, 21, 1, 13, 0, 272, 3, 'FFFFE150', '68140000']
+    gNB : [217, 11, 21, 1, 13, 0, 273, 0, 'FFFFE1F0081400']
+  3.UE  : [217, 12, 21, 1, 13, 0, 272, 4, 'FFFFE150', '88940000']
+    gNB : [217, 12, 21, 1, 13, 32, 241, 7, '9FFFE1F0E89400']
+  4.UE  : [217, 15, 21, 1, 13, 0, 272, 7, 'FFFFE150', 'E8340000']
+    gNB : [217, 15, 21, 1, 13, 0, 273, 1, 'FFFFE158283400']
+
+List of mismatched nHARQID field between gNB and UE log messages: 
+    UE  : ['SFN', 'SlotNo', 'MCS', 'PdschStartSymbol', 'PdschLenSymbol', 'PRB start', 'PRB end', 'HARQProcNo', 'DciBits[0]', 'DciBits[1]']
+    gNB : ['nSFN', 'nSlot', 'nMCS[0]', 'nStartSymbolIndex', 'nNrOfSymbols', 'nRBStart', 'nRBSize', 'nHARQID', 'DCI bits']
+  1.UE  : [217, 10, 21, 1, 13, 0, 272, 2, 'FFFFE150', '48340000']
+    gNB : [217, 10, 21, 1, 13, 0, 273, 14, 'FFFFE159C83400']
+  2.UE  : [217, 11, 21, 1, 13, 0, 272, 3, 'FFFFE150', '68140000']
+    gNB : [217, 11, 21, 1, 13, 0, 273, 0, 'FFFFE1F0081400']
+  3.UE  : [217, 12, 21, 1, 13, 0, 272, 4, 'FFFFE150', '88940000']
+    gNB : [217, 12, 21, 1, 13, 32, 241, 7, '9FFFE1F0E89400']
+  4.UE  : [217, 15, 21, 1, 13, 0, 272, 7, 'FFFFE150', 'E8340000']
+    gNB : [217, 15, 21, 1, 13, 0, 273, 1, 'FFFFE158283400']
+
+List of mismatched nRBSize field between gNB and UE log messages: 
+    UE  : ['SFN', 'SlotNo', 'MCS', 'PdschStartSymbol', 'PdschLenSymbol', 'PRB start', 'PRB end', 'HARQProcNo', 'DciBits[0]', 'DciBits[1]']
+    gNB : ['nSFN', 'nSlot', 'nMCS[0]', 'nStartSymbolIndex', 'nNrOfSymbols', 'nRBStart', 'nRBSize', 'nHARQID', 'DCI bits']
+  1.UE  : [217, 12, 21, 1, 13, 0, 272, 4, 'FFFFE150', '88940000']
+    gNB : [217, 12, 21, 1, 13, 32, 241, 7, '9FFFE1F0E89400']
+
+List of mismatched nRBStart field between gNB and UE log messages: 
+    UE  : ['SFN', 'SlotNo', 'MCS', 'PdschStartSymbol', 'PdschLenSymbol', 'PRB start', 'PRB end', 'HARQProcNo', 'DciBits[0]', 'DciBits[1]']
+    gNB : ['nSFN', 'nSlot', 'nMCS[0]', 'nStartSymbolIndex', 'nNrOfSymbols', 'nRBStart', 'nRBSize', 'nHARQID', 'DCI bits']
+  1.UE  : [218, 12, 31, 1, 13, 0, 240, 12, '9FFFE1F1', '88940000']
+    gNB : [218, 12, 21, 1, 13, 32, 241, 12, '9FFFE1F1889400']
+  2.UE  : [219, 0, 21, 1, 13, 0, 240, 5, '9FFFE150', 'A8340000']
+    gNB : [219, 0, 21, 1, 13, 32, 241, 5, '9FFFE150A83400']
+  3.UE  : [220, 12, 31, 1, 13, 0, 240, 1, '9FFFE1F8', '28940000']
+    gNB : [220, 12, 21, 1, 13, 32, 241, 1, '9FFFE1F8289400']
+  4.UE  : [221, 0, 21, 1, 13, 0, 240, 4, '9FFFE150', '88340000']
+    gNB : [221, 0, 21, 1, 13, 32, 241, 4, '9FFFE150883400']
+  5.UE  : [229, 12, 31, 1, 13, 0, 240, 5, '9FFFE1F0', 'A8940000']
+    gNB : [229, 12, 21, 1, 13, 32, 241, 5, '9FFFE1F0A89400']
+  6.UE  : [230, 12, 31, 1, 13, 0, 240, 1, '9FFFE1F8', '28940000']
+    gNB : [230, 12, 21, 1, 13, 32, 241, 1, '9FFFE1F8289400']
+  7.UE  : [231, 0, 21, 1, 13, 0, 240, 4, '9FFFE150', '88340000']
+    gNB : [231, 0, 21, 1, 13, 32, 241, 4, '9FFFE150883400']
+  8.UE  : [231, 12, 31, 1, 13, 0, 240, 4, '9FFFE1F0', '88940000']
+    gNB : [231, 12, 21, 1, 13, 32, 241, 4, '9FFFE1F0889400']
+  9.UE  : [240, 12, 31, 1, 13, 0, 240, 1, '9FFFE1F8', '28940000']
+    gNB : [240, 12, 21, 1, 13, 32, 241, 1, '9FFFE1F8289400']
+ 10.UE  : [241, 0, 21, 1, 13, 0, 240, 4, '9FFFE150', '88340000']
+    gNB : [241, 0, 21, 1, 13, 32, 241, 4, '9FFFE150883400']
+ 11.UE  : [241, 12, 31, 1, 13, 0, 240, 4, '9FFFE1F0', '88940000']
+    gNB : [241, 12, 21, 1, 13, 32, 241, 4, '9FFFE1F0889400']
+ 12.UE  : [253, 0, 21, 1, 13, 0, 240, 12, '9FFFE159', '88340000']
+    gNB : [253, 0, 21, 1, 13, 32, 241, 12, '9FFFE159883400']
+ 13.UE  : [253, 12, 31, 1, 13, 0, 240, 12, '9FFFE1F9', '88940000']
+    gNB : [253, 12, 21, 1, 13, 32, 241, 12, '9FFFE1F9889400']
+ 14.UE  : [217, 12, 21, 1, 13, 0, 272, 4, 'FFFFE150', '88940000']
+    gNB : [217, 12, 21, 1, 13, 32, 241, 7, '9FFFE1F0E89400']
+
+List of mismatched nMCS[0] field between gNB and UE log messages: 
+    UE  : ['SFN', 'SlotNo', 'MCS', 'PdschStartSymbol', 'PdschLenSymbol', 'PRB start', 'PRB end', 'HARQProcNo', 'DciBits[0]', 'DciBits[1]']
+    gNB : ['nSFN', 'nSlot', 'nMCS[0]', 'nStartSymbolIndex', 'nNrOfSymbols', 'nRBStart', 'nRBSize', 'nHARQID', 'DCI bits']
+  1.UE  : [218, 1, 31, 1, 13, 0, 272, 3, 'FFFFE1F0', '68140000']
+    gNB : [218, 1, 21, 1, 13, 0, 273, 3, 'FFFFE1F0681400']
+  2.UE  : [218, 6, 31, 1, 13, 0, 272, 8, 'FFFFE1F1', '08140000']
+    gNB : [218, 6, 21, 1, 13, 0, 273, 8, 'FFFFE1F1081400']
+  3.UE  : [218, 11, 31, 1, 13, 0, 272, 9, 'FFFFE1F1', '28140000']
+    gNB : [218, 11, 21, 1, 13, 0, 273, 9, 'FFFFE1F1281400']
+  4.UE  : [218, 12, 31, 1, 13, 0, 240, 12, '9FFFE1F1', '88940000']
+    gNB : [218, 12, 21, 1, 13, 32, 241, 12, '9FFFE1F1889400']
+  5.UE  : [218, 16, 31, 1, 13, 0, 272, 8, 'FFFFE1F1', '08140000']
+    gNB : [218, 16, 21, 1, 13, 0, 273, 8, 'FFFFE1F1081400']
+  6.UE  : [220, 11, 31, 1, 13, 0, 272, 14, 'FFFFE1F9', 'C8140000']
+    gNB : [220, 11, 21, 1, 13, 0, 273, 14, 'FFFFE1F9C81400']
+  7.UE  : [220, 12, 31, 1, 13, 0, 240, 1, '9FFFE1F8', '28940000']
+    gNB : [220, 12, 21, 1, 13, 32, 241, 1, '9FFFE1F8289400']
+  8.UE  : [229, 11, 31, 1, 13, 0, 272, 15, 'FFFFE1F1', 'E8140000']
+    gNB : [229, 11, 21, 1, 13, 0, 273, 15, 'FFFFE1F1E81400']
+  9.UE  : [229, 12, 31, 1, 13, 0, 240, 5, '9FFFE1F0', 'A8940000']
+    gNB : [229, 12, 21, 1, 13, 32, 241, 5, '9FFFE1F0A89400']
+ 10.UE  : [230, 11, 31, 1, 13, 0, 272, 14, 'FFFFE1F9', 'C8140000']
+    gNB : [230, 11, 21, 1, 13, 0, 273, 14, 'FFFFE1F9C81400']
+ 11.UE  : [230, 12, 31, 1, 13, 0, 240, 1, '9FFFE1F8', '28940000']
+    gNB : [230, 12, 21, 1, 13, 32, 241, 1, '9FFFE1F8289400']
+ 12.UE  : [231, 11, 31, 1, 13, 0, 272, 2, 'FFFFE1F0', '48140000']
+    gNB : [231, 11, 21, 1, 13, 0, 273, 2, 'FFFFE1F0481400']
+ 13.UE  : [231, 12, 31, 1, 13, 0, 240, 4, '9FFFE1F0', '88940000']
+    gNB : [231, 12, 21, 1, 13, 32, 241, 4, '9FFFE1F0889400']
+ 14.UE  : [240, 11, 31, 1, 13, 0, 272, 14, 'FFFFE1F9', 'C8140000']
+    gNB : [240, 11, 21, 1, 13, 0, 273, 14, 'FFFFE1F9C81400']
+ 15.UE  : [240, 12, 31, 1, 13, 0, 240, 1, '9FFFE1F8', '28940000']
+    gNB : [240, 12, 21, 1, 13, 32, 241, 1, '9FFFE1F8289400']
+ 16.UE  : [241, 11, 31, 1, 13, 0, 272, 2, 'FFFFE1F0', '48140000']
+    gNB : [241, 11, 21, 1, 13, 0, 273, 2, 'FFFFE1F0481400']
+ 17.UE  : [241, 12, 31, 1, 13, 0, 240, 4, '9FFFE1F0', '88940000']
+    gNB : [241, 12, 21, 1, 13, 32, 241, 4, '9FFFE1F0889400']
+ 18.UE  : [253, 11, 31, 1, 13, 0, 272, 9, 'FFFFE1F9', '28140000']
+    gNB : [253, 11, 21, 1, 13, 0, 273, 9, 'FFFFE1F9281400']
+ 19.UE  : [253, 12, 31, 1, 13, 0, 240, 12, '9FFFE1F9', '88940000']
+    gNB : [253, 12, 21, 1, 13, 32, 241, 12, '9FFFE1F9889400']
+
+---------------------------------------------------------------------------
+Elapsed time: 6 seconds
